@@ -20,7 +20,7 @@ using namespace std;
 
 const unsigned CALENDAR_WIDTH = 21;
 const unsigned NUMBER_DAYS_IN_WEEK = 7;
-const unsigned SEPARATOR_SIZE = 2;
+const unsigned SEPARATOR_SIZE = 3;
 const char DISPLAY_FILL = '.';
 
 /**
@@ -28,7 +28,7 @@ const char DISPLAY_FILL = '.';
  *
  * @return void
  */
-void displayCalendar(string year, int month, int firstDayOfMonth, int mondayPosition);
+int displayCalendar(int month, int firstDayOfMonth, int mondayPosition);
 
 /**
  * Determines if a given year is a leap year
@@ -90,6 +90,13 @@ void displayEmptyLine(unsigned colWidth);
  */
 void displayCenteredText(string text, unsigned colWidth);
 
+/**
+ *
+ * @param ss
+ * @return void
+ */
+void cleanStream();
+
 int main() {
 	const int MIN_YEAR = 1600;
 	const int MAX_YEAR = 3000;
@@ -102,51 +109,47 @@ int main() {
 	int year = 0;
 	int mondayPosition = 0;
 
+	// set the default fill
+  cout << setfill(DISPLAY_FILL);
+
 	// Obtain and check user input values for the year and the position of the Monday
 	year = checkUserInput(YEAR_QUESTION, ERROR_MSG, MIN_YEAR, MAX_YEAR);
 	mondayPosition = checkUserInput(DAY_QUESTION, ERROR_MSG, MIN_DAY, MAX_DAY);
 
-	// Convert the year from unsigned to string
+	// Convert the year from unsigned to string and display it
 	stringstream ssIntToString;
 	ssIntToString << year;
 	string yearStr;
 	ssIntToString >> yearStr;
+  displayCenteredText(yearStr, CALENDAR_WIDTH);
 
 	// Display the entire calendar based on the user input
-	cout << setfill(DISPLAY_FILL);
-	displayCalendar(yearStr, 1, 2, mondayPosition);
+	int firstDayOfMonth = dayOf1stJan(year);
+	for (int i = 0; i < 12; ++i)
+    firstDayOfMonth = displayCalendar(i, firstDayOfMonth, mondayPosition);
 
-	//cout << setfill(DISPLAY_FILL);
-	// displayCalendar();
-	//displayCalendar(1, 2, 1);
-	
 	// For Visual Studio : pause the console 
 	//system("Pause");
 
 	return 0;
 }
 
-void displayCalendar(string year, int month, int firstDayOfMonth, int mondayPosition) {
+int displayCalendar(int month, int firstDayOfMonth, int mondayPosition) {
 	string name = getMonthName(month);
 	int nbDays = 31;
 
-	displayCenteredText(year, CALENDAR_WIDTH);
 	displayEmptyLine(CALENDAR_WIDTH);
 	displayCenteredText(name, CALENDAR_WIDTH);
 
 	int firstDayOfWeek = NUMBER_DAYS_IN_WEEK - (mondayPosition - 1);
 	int i = firstDayOfWeek;
 	do {
-		if (i == NUMBER_DAYS_IN_WEEK) i = 0;
+		if (i == NUMBER_DAYS_IN_WEEK or (i > 6 and firstDayOfWeek != NUMBER_DAYS_IN_WEEK)) i = 0;
 
-		cout << setw(3) << getDayInitial(i);
+		cout << setw(SEPARATOR_SIZE) << getDayInitial(i);
 		i++;
-
-		if (i > 6 and firstDayOfWeek != NUMBER_DAYS_IN_WEEK) i = 0;
-
 	} while (i != firstDayOfWeek);
 	cout << endl;
-
 
 	int firstDayMondayPositionDiff = (firstDayOfMonth - 1) + (mondayPosition - 1);
 	int firstDayMonthPosition = firstDayMondayPositionDiff > NUMBER_DAYS_IN_WEEK - 1 ?
@@ -154,7 +157,7 @@ void displayCalendar(string year, int month, int firstDayOfMonth, int mondayPosi
 		: firstDayMondayPositionDiff;
 
 	for (int p = 0; p < firstDayMonthPosition; ++p) {
-		cout << setw(3) << DISPLAY_FILL;
+		cout << setw(SEPARATOR_SIZE) << DISPLAY_FILL;
 	}
 
 	int dayMonthPosition = firstDayMonthPosition;
@@ -165,62 +168,46 @@ void displayCalendar(string year, int month, int firstDayOfMonth, int mondayPosi
 			dayMonthPosition = 0;
 		}
 
-		cout << DISPLAY_FILL;
 		cout << setw(SEPARATOR_SIZE) << date;
 
 		// If it's the last day of the month and it's not a Sunday, fill the end of the line with DISPLAY_FILL
 		if (date == nbDays and dayMonthPosition != NUMBER_DAYS_IN_WEEK - 1) {
-			cout << setw(CALENDAR_WIDTH - (dayMonthPosition * SEPARATOR_SIZE + dayMonthPosition + 3)) << DISPLAY_FILL;
+			cout << setw(CALENDAR_WIDTH - (dayMonthPosition * SEPARATOR_SIZE) - SEPARATOR_SIZE) << DISPLAY_FILL;
 		}
 
 		++dayMonthPosition;
 	}
+	cout << endl;
+
+	return ++dayMonthPosition - (mondayPosition - 1);
 }
 
 string getDayInitial(int day) {
 	switch (day) {
-	case 0:
-		return "L";
-	case 1:
-	case 2:
-		return "M";
-	case 3:
-		return "J";
-	case 4:
-		return "V";
-	case 5:
-		return "S";
-	case 6:
-		return "D";
+    case 0: return "L";
+    case 1:
+    case 2: return "M";
+    case 3: return "J";
+    case 4: return "V";
+    case 5: return "S";
+    case 6: return "D";
 	}
 }
 
 string getMonthName(int month) {
 	switch (month) {
-	case 0:
-		return "Janvier";
-	case 1:
-		return "Fevrier";
-	case 2:
-		return "Mars";
-	case 3:
-		return "Avril";
-	case 4:
-		return "Mai";
-	case 5:
-		return "Juin";
-	case 6:
-		return "Juillet";
-	case 7:
-		return "Aout";
-	case 8:
-		return "Septembre";
-	case 9:
-		return "Octobre";
-	case 10:
-		return "Novembre";
-	case 11:
-		return "Decembre";
+    case 0: return "Janvier";
+    case 1: return "Fevrier";
+    case 2: return "Mars";
+    case 3: return "Avril";
+    case 4: return "Mai";
+    case 5: return "Juin";
+    case 6: return "Juillet";
+    case 7: return "Aout";
+    case 8: return "Septembre";
+    case 9: return "Octobre";
+    case 10: return "Novembre";
+    case 11: return "Decembre";
 	}
 }
 
@@ -231,7 +218,7 @@ void displayCenteredText(const string text, const unsigned colWidth) {
 }
 
 void displayEmptyLine(const unsigned colWidth) {
-	cout << setw(colWidth) << DISPLAY_FILL << endl;
+  displayCenteredText("", colWidth);
 }
 
 unsigned isLeapYear(unsigned year) {
@@ -253,48 +240,47 @@ unsigned dayOf1stJan(unsigned year) {
 	int a = year - c;
 	int m = month + 12 * c - 2;
 
-	return (day + a + a / 4 - a / 100 + a / 400 + (31 * m) / 12) % 7;
+	int january1st = (day + a + a / 4 - a / 100 + a / 400 + (31 * m) / 12) % 7;
+	return january1st == 0 ? NUMBER_DAYS_IN_WEEK : january1st;
 }
 
 int checkUserInput(string question, string errorMessage, const int MIN_VALUE, const int MAX_VALUE) {
-	string rawInput = "";
-	stringstream ssInput;
-	bool inputError = false;
+	bool inputError;
+	string rawInput;
 	unsigned value;
 
 	do {
+	  inputError = false;
+    rawInput = "";
+
 		cout << question;
 		cin >> rawInput;
 
 		if (rawInput.length() != (int)(log10(MIN_VALUE) + 1)) {
 			inputError = true;
-			rawInput = "";
+      continue;
 		}
 
-		ssInput << rawInput;
-		if (!(ssInput >> value)) {
-			inputError = true;
+		cleanStream();
+		stringstream ssInput(rawInput);
+
+		if (ssInput >> value) {
+      if (value < MIN_VALUE or value > MAX_VALUE) {
+        inputError = true;
+        continue;
+      }
 		}
 		else {
-			if (value >= MIN_VALUE && value <= MAX_VALUE) {
-				inputError = false;
-			}
-			else {
-				inputError = true;
-			}
+      inputError = true;
+      continue;
 		}
 
-		cin.clear();
-		cin.ignore(numeric_limits<int>::max(), '\n');
-		ssInput.clear();
-		ssInput.str("");
-		rawInput = "";
+	} while (inputError and cout << errorMessage << endl);
 
-		if (value >= MIN_VALUE && value <= MAX_VALUE && !inputError) {
-			return value;
-		}
-		else {
-			cout << errorMessage << endl;
-		}
-	} while (inputError);
+	return value;
+}
+
+void cleanStream() {
+  cin.clear();
+  cin.ignore(numeric_limits<int>::max(), '\n');
 }
