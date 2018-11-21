@@ -3,7 +3,7 @@
  Fichier : main.cpp
  Auteur(s) : Kayoumi Doran, Bonzon Ludovic et Geleta Fekadu
  Date : 14.11.2018
- But : Afficher dans la console le calendrier d'une année donnée par l'utilisateur (1600-3000)
+ But : Afficher dans la console le calendrier d'une annï¿½e donnï¿½e par l'utilisateur (1600-3000)
 	   et permettant de pouvoir choisir la position du lundi dans l'ordre des 7 jours de la semaine (1-7)
 
  Remarque(s) :
