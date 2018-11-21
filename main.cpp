@@ -19,9 +19,7 @@
 using namespace std;
 
 const unsigned NUMBER_DAYS_IN_WEEK = 7;
-const unsigned SEPARATOR_SIZE = 3;
 const char DISPLAY_FILL = ' ';
-
 enum Months { JANUARY, FEBRURARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 enum Days { MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY };
 
@@ -30,7 +28,13 @@ enum Days { MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY };
  *
  * @return void
  */
-unsigned displayCalendar(unsigned month, unsigned firstDayOfMonth, unsigned mondayPosition, unsigned year, unsigned width);
+unsigned displayCalendar(
+        unsigned month,
+        unsigned firstDayOfMonth,
+        unsigned mondayPosition,
+        unsigned year,
+        const unsigned& WIDTH,
+        const unsigned& COL_WIDTH);
 
 /**
  * Determines if a given year is a leap year
@@ -117,6 +121,7 @@ int main() {
 	const unsigned MIN_DAY = 1;
 	const unsigned MAX_DAY = 7;
   const unsigned CALENDAR_WIDTH = 21;
+  const unsigned COL_WIDTH = 3;
 	const string YEAR_QUESTION = "Quelle annee voulez-vous afficher? (1600-3000) ";
 	const string DAY_QUESTION = "Quel jour de la semaine est le lundi? (1-7) ";
 	const string ERROR_MSG = "Entree non valide";
@@ -142,8 +147,10 @@ int main() {
 
 	// Display the entire calendar based on the user input
   unsigned firstDayOfMonth = dayOf1stJan(year);
-	for (unsigned i = 0; i < 12; ++i)
-		firstDayOfMonth = displayCalendar(i, firstDayOfMonth, mondayPosition, year, CALENDAR_WIDTH);
+	for (unsigned month = 0; month < 12; ++month) {
+    displayEmptyLine(CALENDAR_WIDTH);
+    firstDayOfMonth = displayCalendar(month, firstDayOfMonth, mondayPosition, year, CALENDAR_WIDTH, COL_WIDTH);
+  }
 
 	// For Visual Studio : pause the console 
 	//system("Pause");
@@ -151,11 +158,16 @@ int main() {
 	return 0;
 }
 
-unsigned displayCalendar(unsigned month, unsigned firstDayOfMonth, unsigned mondayPosition, unsigned year, unsigned width) {
+unsigned displayCalendar(unsigned month,
+        unsigned firstDayOfMonth,
+        unsigned mondayPosition,
+        unsigned year,
+        const unsigned& WIDTH,
+        const unsigned& COL_WIDTH) {
+
 	unsigned nbDays = getMonthLength(year, month);
 
-	displayEmptyLine(width);
-	displayCenteredText(getMonthName(month), width);
+	displayCenteredText(getMonthName(month), WIDTH);
 
   unsigned firstDayOfWeek = NUMBER_DAYS_IN_WEEK - (mondayPosition - 1);
   unsigned i = firstDayOfWeek;
@@ -163,7 +175,7 @@ unsigned displayCalendar(unsigned month, unsigned firstDayOfMonth, unsigned mond
 	do {
 		if (i == NUMBER_DAYS_IN_WEEK or (i > 6 and firstDayOfWeek != NUMBER_DAYS_IN_WEEK)) i = 0;
 
-		cout << setw(SEPARATOR_SIZE) << getDayInitial(i);
+		cout << setw(COL_WIDTH) << getDayInitial(i);
 		i++;
 	} while (i != firstDayOfWeek);
 	cout << endl;
@@ -174,7 +186,7 @@ unsigned displayCalendar(unsigned month, unsigned firstDayOfMonth, unsigned mond
 		: firstDayMondayPositionDiff;
 
 	for (size_t p = 0; p < firstDayMonthPosition; ++p) {
-		cout << setw(SEPARATOR_SIZE) << DISPLAY_FILL;
+		cout << setw(COL_WIDTH) << DISPLAY_FILL;
 	}
 
   unsigned dayMonthPosition = firstDayMonthPosition;
@@ -185,11 +197,11 @@ unsigned displayCalendar(unsigned month, unsigned firstDayOfMonth, unsigned mond
 			dayMonthPosition = 0;
 		}
 
-		cout << setw(SEPARATOR_SIZE) << date;
+		cout << setw(COL_WIDTH) << date;
 
 		// If it's the last day of the month and it's not a Sunday, fill the end of the line with DISPLAY_FILL
 		if (date == nbDays and dayMonthPosition != NUMBER_DAYS_IN_WEEK - 1) {
-			cout << setw(width - (dayMonthPosition * SEPARATOR_SIZE) - SEPARATOR_SIZE) << DISPLAY_FILL;
+			cout << setw(WIDTH - (dayMonthPosition * COL_WIDTH) - COL_WIDTH) << DISPLAY_FILL;
 		}
 
 		++dayMonthPosition;
@@ -258,8 +270,10 @@ unsigned dayOf1stJan(unsigned year) {
 	return january1st == 0 ? NUMBER_DAYS_IN_WEEK : january1st;
 }
 
-unsigned checkUserInput(const string& question, const string& errorMessage,
-        const unsigned MIN_VALUE, const unsigned MAX_VALUE) {
+unsigned checkUserInput(const string& question,
+        const string& errorMessage,
+        const unsigned MIN_VALUE,
+        const unsigned MAX_VALUE) {
 	bool inputError;
 	string rawInput;
 	unsigned value;
@@ -271,7 +285,7 @@ unsigned checkUserInput(const string& question, const string& errorMessage,
 		cout << question;
 		cin >> rawInput;
 
-		if (rawInput.length() != (int)(log10(MIN_VALUE) + 1)) {
+		if (rawInput.length() != (unsigned)(log10(MIN_VALUE) + 1)) {
 			inputError = true;
 			continue;
 		}
