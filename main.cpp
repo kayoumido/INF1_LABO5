@@ -33,8 +33,8 @@ unsigned displayCalendar(
         unsigned firstDayOfMonth,
         unsigned mondayPosition,
         unsigned year,
-        const unsigned& WIDTH,
-        const unsigned& COL_WIDTH);
+        const int& WIDTH,
+        const int& COL_WIDTH);
 
 /**
  * Determines if a given year is a leap year
@@ -162,8 +162,8 @@ unsigned displayCalendar(unsigned month,
         unsigned firstDayOfMonth,
         unsigned mondayPosition,
         unsigned year,
-        const unsigned& WIDTH,
-        const unsigned& COL_WIDTH) {
+        const int& WIDTH,
+        const int& COL_WIDTH) {
 
 	unsigned nbDays = getMonthLength(year, month);
 
@@ -201,7 +201,7 @@ unsigned displayCalendar(unsigned month,
 
 		// If it's the last day of the month and it's not a Sunday, fill the end of the line with DISPLAY_FILL
 		if (date == nbDays and dayMonthPosition != NUMBER_DAYS_IN_WEEK - 1) {
-			cout << setw(WIDTH - (dayMonthPosition * COL_WIDTH) - COL_WIDTH) << DISPLAY_FILL;
+			cout << setw(WIDTH - ((int)dayMonthPosition * COL_WIDTH) - COL_WIDTH) << DISPLAY_FILL;
 		}
 
 		++dayMonthPosition;
