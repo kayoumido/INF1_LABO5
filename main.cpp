@@ -18,17 +18,19 @@
 
 using namespace std;
 
-const unsigned CALENDAR_WIDTH = 21;
 const unsigned NUMBER_DAYS_IN_WEEK = 7;
 const unsigned SEPARATOR_SIZE = 3;
 const char DISPLAY_FILL = ' ';
+
+enum Months { JANUARY, FEBRURARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
+enum Days { MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY };
 
 /**
  * Display the calendar for a given month
  *
  * @return void
  */
-int displayCalendar(int month, int firstDayOfMonth, int mondayPosition, int& nbDays);
+unsigned displayCalendar(unsigned month, unsigned firstDayOfMonth, unsigned mondayPosition, unsigned year, unsigned width);
 
 /**
  * Determines if a given year is a leap year
@@ -60,7 +62,7 @@ unsigned dayOf1stJan(unsigned year);
  * @param day int the day number (0-6)
  * @return string day
  */
-string getDayInitial(int day);
+string getDayInitial(unsigned day);
 
 /**
  * Get the name of a month based on it's number
@@ -69,7 +71,15 @@ string getDayInitial(int day);
  * @param month int Month number
  * @return string month name
  */
-string getMonthName(int month);
+string getMonthName(unsigned month);
+
+/**
+ *
+ * @param year
+ * @param month
+ * @return
+ */
+unsigned getMonthLength(unsigned year, unsigned month);
 
 /**
   * Ask and validates user data
@@ -80,7 +90,7 @@ string getMonthName(int month);
   * @param MAX_VALUE int max value for the expected value
   * @return int value Validated user input
   */
-int checkUserInput(string question, string errorMessage, const int MIN_VALUE, const int MAX_VALUE);
+unsigned checkUserInput(const string& question, const string& errorMessage, unsigned MIN_VALUE, unsigned MAX_VALUE);
 
 /**
  * Displays an empty line
@@ -93,26 +103,26 @@ void displayEmptyLine(unsigned colWidth);
  *
  * @param text string
  */
-void displayCenteredText(string text, unsigned colWidth);
+void displayCenteredText(const string& text, unsigned colWidth);
 
 /**
  *
- * @param ss
  * @return void
  */
 void cleanStream();
 
 int main() {
-	const int MIN_YEAR = 1600;
-	const int MAX_YEAR = 3000;
-	const int MIN_DAY = 1;
-	const int MAX_DAY = 7;
+	const unsigned MIN_YEAR = 1600;
+	const unsigned MAX_YEAR = 3000;
+	const unsigned MIN_DAY = 1;
+	const unsigned MAX_DAY = 7;
+  const unsigned CALENDAR_WIDTH = 21;
 	const string YEAR_QUESTION = "Quelle annee voulez-vous afficher? (1600-3000) ";
 	const string DAY_QUESTION = "Quel jour de la semaine est le lundi? (1-7) ";
 	const string ERROR_MSG = "Entree non valide";
 
-	int year = 0;
-	int mondayPosition = 0;
+  unsigned year = 0;
+  unsigned mondayPosition = 0;
 
 	// set the default fill
 	cout << setfill(DISPLAY_FILL);
@@ -131,21 +141,9 @@ int main() {
 	displayCenteredText(yearStr, CALENDAR_WIDTH);
 
 	// Display the entire calendar based on the user input
-	int nbDays = 31;
-	int firstDayOfMonth = dayOf1stJan(year);
-	for (int i = 0; i < 12; ++i) {
-		// Particular cases of February and July August
-		if (i == 1)
-			if (isLeapYear(year))
-				nbDays = 29;
-			else
-				nbDays = 28;
-		else if (i == 6 or i == 7) {
-			nbDays = 31;
-		}
-
-		firstDayOfMonth = displayCalendar(i, firstDayOfMonth, mondayPosition, nbDays);
-	}
+  unsigned firstDayOfMonth = dayOf1stJan(year);
+	for (unsigned i = 0; i < 12; ++i)
+		firstDayOfMonth = displayCalendar(i, firstDayOfMonth, mondayPosition, year, CALENDAR_WIDTH);
 
 	// For Visual Studio : pause the console 
 	//system("Pause");
@@ -153,14 +151,14 @@ int main() {
 	return 0;
 }
 
-int displayCalendar(int month, int firstDayOfMonth, int mondayPosition, int& nbDays) {
-	string name = getMonthName(month);
+unsigned displayCalendar(unsigned month, unsigned firstDayOfMonth, unsigned mondayPosition, unsigned year, unsigned width) {
+	unsigned nbDays = getMonthLength(year, month);
 
-	displayEmptyLine(CALENDAR_WIDTH);
-	displayCenteredText(name, CALENDAR_WIDTH);
+	displayEmptyLine(width);
+	displayCenteredText(getMonthName(month), width);
 
-	int firstDayOfWeek = NUMBER_DAYS_IN_WEEK - (mondayPosition - 1);
-	int i = firstDayOfWeek;
+  unsigned firstDayOfWeek = NUMBER_DAYS_IN_WEEK - (mondayPosition - 1);
+  unsigned i = firstDayOfWeek;
 	// Displays the intial letter of the weekday
 	do {
 		if (i == NUMBER_DAYS_IN_WEEK or (i > 6 and firstDayOfWeek != NUMBER_DAYS_IN_WEEK)) i = 0;
@@ -170,17 +168,17 @@ int displayCalendar(int month, int firstDayOfMonth, int mondayPosition, int& nbD
 	} while (i != firstDayOfWeek);
 	cout << endl;
 
-	int firstDayMondayPositionDiff = (firstDayOfMonth - 1) + (mondayPosition - 1);
-	int firstDayMonthPosition = firstDayMondayPositionDiff > NUMBER_DAYS_IN_WEEK - 1 ?
+  unsigned firstDayMondayPositionDiff = (firstDayOfMonth - 1) + (mondayPosition - 1);
+  unsigned firstDayMonthPosition = firstDayMondayPositionDiff > NUMBER_DAYS_IN_WEEK - 1 ?
 		firstDayMondayPositionDiff - NUMBER_DAYS_IN_WEEK
 		: firstDayMondayPositionDiff;
 
-	for (int p = 0; p < firstDayMonthPosition; ++p) {
+	for (size_t p = 0; p < firstDayMonthPosition; ++p) {
 		cout << setw(SEPARATOR_SIZE) << DISPLAY_FILL;
 	}
 
-	int dayMonthPosition = firstDayMonthPosition;
-	for (int date = 1; date <= nbDays; ++date) {
+  unsigned dayMonthPosition = firstDayMonthPosition;
+	for (unsigned date = 1; date <= nbDays; ++date) {
 		// If we are at the end of the week, pass to the next line, i.e. the next week.
 		if (dayMonthPosition == NUMBER_DAYS_IN_WEEK) {
 			cout << endl;
@@ -191,83 +189,77 @@ int displayCalendar(int month, int firstDayOfMonth, int mondayPosition, int& nbD
 
 		// If it's the last day of the month and it's not a Sunday, fill the end of the line with DISPLAY_FILL
 		if (date == nbDays and dayMonthPosition != NUMBER_DAYS_IN_WEEK - 1) {
-			cout << setw(CALENDAR_WIDTH - (dayMonthPosition * SEPARATOR_SIZE) - SEPARATOR_SIZE) << DISPLAY_FILL;
+			cout << setw(width - (dayMonthPosition * SEPARATOR_SIZE) - SEPARATOR_SIZE) << DISPLAY_FILL;
 		}
 
 		++dayMonthPosition;
 	}
-
-	// Toggle between 30 and 31 days months
-	nbDays == 31 ? nbDays = 30 : nbDays = 31;
 
 	cout << endl;
 
 	return ++dayMonthPosition - (mondayPosition - 1);
 }
 
-string getDayInitial(int day) {
+string getDayInitial(unsigned day) {
 	switch (day) {
-	case 0: return "L";
-	case 1:
-	case 2: return "M";
-	case 3: return "J";
-	case 4: return "V";
-	case 5: return "S";
-	case 6: return "D";
+    case Days::MONDAY: return "L";
+    case Days::TUESDAY: return "M";
+    case Days::WEDNESDAY: return "M";
+    case Days::THURSDAY: return "J";
+    case Days::FRIDAY: return "V";
+    case Days::SATURDAY: return "S";
+    case Days::SUNDAY: return "D";
+    default: return "!";
 	}
 }
 
-string getMonthName(int month) {
+string getMonthName(unsigned month) {
 	switch (month) {
-	case 0: return "Janvier";
-	case 1: return "Fevrier";
-	case 2: return "Mars";
-	case 3: return "Avril";
-	case 4: return "Mai";
-	case 5: return "Juin";
-	case 6: return "Juillet";
-	case 7: return "Aout";
-	case 8: return "Septembre";
-	case 9: return "Octobre";
-	case 10: return "Novembre";
-	case 11: return "Decembre";
+    case Months::JANUARY: return "Janvier";
+    case Months::FEBRURARY: return "Fevrier";
+    case Months::MARCH: return "Mars";
+    case Months::APRIL: return "Avril";
+    case Months::MAY: return "Mai";
+    case Months::JUNE: return "Juin";
+    case Months::JULY: return "Juillet";
+    case Months::AUGUST: return "Aout";
+    case Months::SEPTEMBER: return "Septembre";
+    case Months::OCTOBER: return "Octobre";
+    case Months::NOVEMBER: return "Novembre";
+    case Months::DECEMBER: return "Decembre";
+    default: return "ERROR";
 	}
 }
 
-void displayCenteredText(const string text, const unsigned colWidth) {
+void displayCenteredText(const string& text, const unsigned colWidth) {
 	cout << setw(colWidth / 2 - (int)text.length() / 2) << DISPLAY_FILL;
 	cout << setw((int)text.length()) << text;
 	cout << setw(colWidth - (colWidth / 2 - (int)text.length() / 2) - (int)text.length()) << DISPLAY_FILL << endl;
 }
 
 void displayEmptyLine(const unsigned colWidth) {
-	displayCenteredText("", colWidth);
+  cout << setw(colWidth) << "" << endl;
 }
 
 bool isLeapYear(unsigned year) {
-	const unsigned LEAP_YEAR_DAYS = 366;
-	const unsigned NORMAL_YEAR_DAYS = 365;
-
 	// is a leap year (366 days)
-	if (((year % 4 == 0) && (year % 100) != 0) || year % 400 == 0)
-		return true;
-	else // is a common year (365 days)
-		return false;
+  return ((year % 4 == 0) && (year % 100) != 0) || year % 400 == 0;
 }
 
 unsigned dayOf1stJan(unsigned year) {
 	unsigned day = 1;
 	unsigned month = 1;
 
-	int c = (14 - month) / 12;
-	int a = year - c;
-	int m = month + 12 * c - 2;
+	unsigned c = (14 - month) / 12;
+	unsigned a = year - c;
+  unsigned m = month + 12 * c - 2;
 
-	int january1st = (day + a + a / 4 - a / 100 + a / 400 + (31 * m) / 12) % 7;
+	unsigned january1st = (day + a + a / 4 - a / 100 + a / 400 + (31 * m) / 12) % 7;
 	return january1st == 0 ? NUMBER_DAYS_IN_WEEK : january1st;
 }
 
-int checkUserInput(string question, string errorMessage, const int MIN_VALUE, const int MAX_VALUE) {
+unsigned checkUserInput(const string& question, const string& errorMessage,
+        const unsigned MIN_VALUE, const unsigned MAX_VALUE) {
 	bool inputError;
 	string rawInput;
 	unsigned value;
@@ -306,4 +298,25 @@ int checkUserInput(string question, string errorMessage, const int MIN_VALUE, co
 void cleanStream() {
 	cin.clear();
 	cin.ignore(numeric_limits<int>::max(), '\n');
+}
+
+unsigned getMonthLength(unsigned year, unsigned month) {
+
+  switch(month) {
+    case Months::JANUARY:
+    case Months::MARCH:
+    case Months::MAY:
+    case Months::JULY:
+    case Months::AUGUST:
+    case Months::OCTOBER:
+    case Months::DECEMBER: return 31;
+
+    case Months::APRIL:
+    case Months::JUNE:
+    case Months::SEPTEMBER:
+    case Months::NOVEMBER: return 30;
+
+    case Months::FEBRURARY: return isLeapYear(year) ? 29 : 28;
+    default: return 0;
+  }
 }
