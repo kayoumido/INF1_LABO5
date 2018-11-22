@@ -227,13 +227,21 @@ unsigned displayCalendar(unsigned month,
 	const int& WIDTH,
 	const int& COL_WIDTH) {
 
+  // the day position entered by the user is between 1-7 but the values used by the algorithm is between 0-6
+  //  so the valued entered by the user are reduced by one.
+  mondayPosition--;
+  firstDayOfMonth--;
+
+
 	unsigned nbDays = getMonthLength(year, month);
 
 	displayCenteredText(getMonthName(month), WIDTH);
 
-	unsigned firstDayOfWeek = NUMBER_DAYS_IN_WEEK - (mondayPosition - 1);
-	unsigned i = firstDayOfWeek;
-	// Displays the intial letter of the weekday
+	// find the first day of the week depending on the position of the monday.
+	//  e.g. if monday is in the second position, then the first day of the week will ba a sunday
+  unsigned firstDayOfWeek = NUMBER_DAYS_IN_WEEK - mondayPosition;
+  unsigned i = firstDayOfWeek;
+	// displays the initials of the weekdays
 	do {
 		if (i == NUMBER_DAYS_IN_WEEK or (i > 6 and firstDayOfWeek != NUMBER_DAYS_IN_WEEK)) i = 0;
 
@@ -242,18 +250,23 @@ unsigned displayCalendar(unsigned month,
 	} while (i != firstDayOfWeek);
 	cout << endl;
 
-	unsigned firstDayMondayPositionDiff = (firstDayOfMonth - 1) + (mondayPosition - 1);
-	unsigned firstDayMonthPosition = firstDayMondayPositionDiff > NUMBER_DAYS_IN_WEEK - 1 ?
+	// estimate the position of the first day of the month depending on the position of the monday
+  unsigned firstDayMondayPositionDiff = firstDayOfMonth + mondayPosition;
+  // if the estimate is greater than the number of days in the week,
+  //    it means the first day is before the position of monday
+  //    otherwise the estimate was correct.
+  unsigned firstDayMonthPosition = firstDayMondayPositionDiff > NUMBER_DAYS_IN_WEEK - 1 ?
 		firstDayMondayPositionDiff - NUMBER_DAYS_IN_WEEK
 		: firstDayMondayPositionDiff;
 
+  // fill the line with DISPLAY_FILL until the position of the first day of the month
 	for (size_t p = 0; p < firstDayMonthPosition; ++p) {
 		cout << setw(COL_WIDTH) << DISPLAY_FILL;
 	}
 
 	unsigned dayMonthPosition = firstDayMonthPosition;
 	for (unsigned date = 1; date <= nbDays; ++date) {
-		// If we are at the end of the week, pass to the next line, i.e. the next week.
+		// if it's the end of the week, pass to the next line, i.e. the next week.
 		if (dayMonthPosition == NUMBER_DAYS_IN_WEEK) {
 			cout << endl;
 			dayMonthPosition = 0;
@@ -261,7 +274,7 @@ unsigned displayCalendar(unsigned month,
 
 		cout << setw(COL_WIDTH) << date;
 
-		// If it's the last day of the month and it's not a Sunday, fill the end of the line with DISPLAY_FILL
+		// if it's the last day of the month and it's not a Sunday, fill the end of the line with DISPLAY_FILL
 		if (date == nbDays and dayMonthPosition != NUMBER_DAYS_IN_WEEK - 1) {
 			cout << setw(WIDTH - ((int)dayMonthPosition * COL_WIDTH) - COL_WIDTH) << DISPLAY_FILL;
 		}
@@ -271,7 +284,7 @@ unsigned displayCalendar(unsigned month,
 
 	cout << endl;
 
-	return ++dayMonthPosition - (mondayPosition - 1);
+	return ++dayMonthPosition - mondayPosition;
 }
 
 unsigned getMonthLength(unsigned year, unsigned month) {
@@ -312,6 +325,7 @@ string getMonthName(unsigned month) {
 	}
 }
 
+	cout << setw((int)text.length()) << text;
 string getDayInitial(unsigned day) {
 	switch (day) {
 	case Days::MONDAY: return "L";
