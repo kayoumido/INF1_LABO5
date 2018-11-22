@@ -3,10 +3,10 @@
  Fichier : main.cpp
  Auteur(s) : Kayoumi Doran, Bonzon Ludovic et Geleta Fekadu
  Date : 14.11.2018
- But : Afficher dans la console le calendrier d'une ann�e donn�e par l'utilisateur (1600-3000)
+ But : Afficher dans la console le calendrier grégorien d'une annee donnee par l'utilisateur (1600-3000)
 	   et permettant de pouvoir choisir la position du lundi dans l'ordre des 7 jours de la semaine (1-7)
 
- Remarque(s) :
+ Remarque(s) : 
  Compilateur : g++ 6.3.0
  --------------------------- */
 
@@ -23,6 +23,38 @@ const unsigned NUMBER_DAYS_IN_WEEK = 7;
 const char DISPLAY_FILL = ' ';
 enum Months { JANUARY, FEBRURARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 enum Days { MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY };
+
+/**
+  * @brief Ask and validates user data
+  *
+  * @param question string Question to ask the user
+  * @param errorMessage string Error message to display if the user enters non valid value
+  * @param MIN_VALUE unsigned Minimum value for the expected value
+  * @param MAX_VALUE unsigned Maximum value for the expected value
+  * @return unsigned Validated user input
+  */
+unsigned checkUserInput(const string& question, const string& errorMessage, unsigned MIN_VALUE, unsigned MAX_VALUE);
+
+/**
+ * @brief Cleans the cin stream after use
+ * @return void
+ */
+void cleanStream();
+
+/**
+ * @brief Displays an empty line
+ * @return void
+ */
+void displayEmptyLine(unsigned colWidth);
+
+/**
+ * @brief Displays a centered text
+ *
+ * @param text string The string to display centered
+ * @param colWidth unsigned Width of the column
+ * @return void
+ */
+void displayCenteredText(const string& text, unsigned colWidth);
 
 /**
  * @brief Display the calendar for a given year
@@ -43,6 +75,37 @@ unsigned displayCalendar(
 	unsigned year,
 	const int& WIDTH,
 	const int& COL_WIDTH);
+
+/**
+ * @brief Obtains the number of days in any given month
+ *
+ * There's a odd/even link between the months and their number of days,
+ * but months such as February have either 28 or 29 days,
+ * and July and August always have 31 days which creates a shift for the second part of the year
+
+ * @param year unsigned Year used to determine if it's a leap year or not
+ * @param month unsigned Current month given to calculate the number of days [0-11]
+ * @return unsigned Number of days in a specific month of a specific year
+ */
+unsigned getMonthLength(unsigned year, unsigned month);
+
+/**
+ * @brief Get the name of a month based on its number
+ *  e.g 7 --> Aout
+ *
+ * @param month int Month number [0-11]
+ * @return string Month name
+ */
+string getMonthName(unsigned month);
+
+/**
+ * @brief Get the initial of a day based on its number
+ *  e.g. 2 (Mardi) --> M
+ *
+ * @param day int The day number [0-6]
+ * @return string Initial of the day (L,M,M,J,V,S,D)
+ */
+string getDayInitial(unsigned day);
 
 /**
  * @brief Determines if a given year is a leap year or a common year
@@ -67,70 +130,6 @@ bool isLeapYear(unsigned year);
  */
 unsigned dayOf1stJan(unsigned year);
 
-/**
- * @brief Get the initial of a day based on its number
- *  e.g. 2 (Mardi) --> M
- *
- * @param day int The day number [0-6]
- * @return string Initial of the day (L,M,M,J,V,S,D)
- */
-string getDayInitial(unsigned day);
-
-/**
- * @brief Get the name of a month based on its number
- *  e.g 7 --> Aout
- *
- * @param month int Month number [0-11]
- * @return string Month name
- */
-string getMonthName(unsigned month);
-
-/**
- * @brief Obtains the number of days in any given month
- *
- * There's a odd/even link between the months and their number of days,
- * but months such as February have either 28 or 29 days,
- * and July and August always have 31 days which creates a shift for the second part of the year
-
- * @param year unsigned Year used to determine if it's a leap year or not
- * @param month unsigned Current month given to calculate the number of days [0-11]
- * @return unsigned Number of days in a specific month of a specific year
- */
-unsigned getMonthLength(unsigned year, unsigned month);
-
-/**
-  * @brief Ask and validates user data
-  *
-  * @param question string Question to ask the user
-  * @param errorMessage string Error message to display if the user enters non valid value
-  * @param MIN_VALUE unsigned Minimum value for the expected value
-  * @param MAX_VALUE unsigned Maximum value for the expected value
-  * @return unsigned Validated user input
-  */
-unsigned checkUserInput(const string& question, const string& errorMessage, unsigned MIN_VALUE, unsigned MAX_VALUE);
-
-/**
- * @brief Displays an empty line
- *
- * @return void
- */
-void displayEmptyLine(unsigned colWidth);
-
-/**
- * @brief Displays a centered text
- *
- * @param text string The string to display centered
- * @param colWidth unsigned Width of the column
- * @return void
- */
-void displayCenteredText(const string& text, unsigned colWidth);
-
-/**
- * @brief Cleans the cin stream after use
- *
- * @return void
- */
-void cleanStream();
 
 int main() {
 	const unsigned MIN_YEAR = 1600;
@@ -164,6 +163,61 @@ int main() {
 	}
 
 	return 0;
+}
+
+
+unsigned checkUserInput(const string& question,
+	const string& errorMessage,
+	const unsigned MIN_VALUE,
+	const unsigned MAX_VALUE) {
+	bool inputError;
+	string rawInput;
+	unsigned value = 0;
+
+	do {
+		inputError = false;
+		rawInput = "";
+
+		cout << question;
+		cin >> rawInput;
+
+		// Checks that the length of the input isn't longer than what we want
+		if (rawInput.length() != (unsigned)(log10(MIN_VALUE) + 1)) {
+			inputError = true;
+			continue;
+		}
+
+		cleanStream();
+		stringstream ssInput(rawInput);
+
+		if (ssInput >> value) {
+			if (value < MIN_VALUE or value > MAX_VALUE) {
+				inputError = true;
+				continue;
+			}
+		}
+		else {
+			inputError = true;
+			continue;
+		}
+	} while (inputError and cout << errorMessage << endl);
+
+	return value;
+}
+
+void cleanStream() {
+	cin.clear();
+	cin.ignore(numeric_limits<int>::max(), '\n');
+}
+
+void displayEmptyLine(const unsigned colWidth) {
+	cout << setw(colWidth) << "" << endl;
+}
+
+void displayCenteredText(const string& text, const unsigned colWidth) {
+	cout << setw(colWidth / 2 - (int)text.length() / 2) << DISPLAY_FILL;
+	cout << setw((int)text.length()) << text;
+	cout << setw(colWidth - (colWidth / 2 - (int)text.length() / 2) - (int)text.length()) << DISPLAY_FILL << endl;
 }
 
 unsigned displayCalendar(unsigned month,
@@ -220,16 +274,23 @@ unsigned displayCalendar(unsigned month,
 	return ++dayMonthPosition - (mondayPosition - 1);
 }
 
-string getDayInitial(unsigned day) {
-	switch (day) {
-	case Days::MONDAY: return "L";
-	case Days::TUESDAY: return "M";
-	case Days::WEDNESDAY: return "M";
-	case Days::THURSDAY: return "J";
-	case Days::FRIDAY: return "V";
-	case Days::SATURDAY: return "S";
-	case Days::SUNDAY: return "D";
-	default: return "!";
+unsigned getMonthLength(unsigned year, unsigned month) {
+	switch (month) {
+	case Months::JANUARY:
+	case Months::MARCH:
+	case Months::MAY:
+	case Months::JULY:
+	case Months::AUGUST:
+	case Months::OCTOBER:
+	case Months::DECEMBER: return 31;
+
+	case Months::APRIL:
+	case Months::JUNE:
+	case Months::SEPTEMBER:
+	case Months::NOVEMBER: return 30;
+
+	case Months::FEBRURARY: return isLeapYear(year) ? 29 : 28;
+	default: return 0;
 	}
 }
 
@@ -251,14 +312,17 @@ string getMonthName(unsigned month) {
 	}
 }
 
-void displayCenteredText(const string& text, const unsigned colWidth) {
-	cout << setw(colWidth / 2 - (int)text.length() / 2) << DISPLAY_FILL;
-	cout << setw((int)text.length()) << text;
-	cout << setw(colWidth - (colWidth / 2 - (int)text.length() / 2) - (int)text.length()) << DISPLAY_FILL << endl;
-}
-
-void displayEmptyLine(const unsigned colWidth) {
-	cout << setw(colWidth) << "" << endl;
+string getDayInitial(unsigned day) {
+	switch (day) {
+	case Days::MONDAY: return "L";
+	case Days::TUESDAY: return "M";
+	case Days::WEDNESDAY: return "M";
+	case Days::THURSDAY: return "J";
+	case Days::FRIDAY: return "V";
+	case Days::SATURDAY: return "S";
+	case Days::SUNDAY: return "D";
+	default: return "!";
+	}
 }
 
 bool isLeapYear(unsigned year) {
@@ -275,68 +339,4 @@ unsigned dayOf1stJan(unsigned year) {
 
 	unsigned january1st = (day + a + a / 4 - a / 100 + a / 400 + (31 * m) / 12) % 7;
 	return january1st == 0 ? NUMBER_DAYS_IN_WEEK : january1st;
-}
-
-unsigned checkUserInput(const string& question,
-	const string& errorMessage,
-	const unsigned MIN_VALUE,
-	const unsigned MAX_VALUE) {
-	bool inputError;
-	string rawInput;
-	unsigned value = 0;
-
-	do {
-		inputError = false;
-		rawInput = "";
-
-		cout << question;
-		cin >> rawInput;
-
-		// Checks that the length of the input isn't longer than what we want
-		if (rawInput.length() != (unsigned)(log10(MIN_VALUE) + 1)) {
-			inputError = true;
-			continue;
-		}
-
-		cleanStream();
-		stringstream ssInput(rawInput);
-
-		if (ssInput >> value) {
-			if (value < MIN_VALUE or value > MAX_VALUE) {
-				inputError = true;
-				continue;
-			}
-		}
-		else {
-			inputError = true;
-			continue;
-		}
-	} while (inputError and cout << errorMessage << endl);
-
-	return value;
-}
-
-void cleanStream() {
-	cin.clear();
-	cin.ignore(numeric_limits<int>::max(), '\n');
-}
-
-unsigned getMonthLength(unsigned year, unsigned month) {
-	switch (month) {
-	case Months::JANUARY:
-	case Months::MARCH:
-	case Months::MAY:
-	case Months::JULY:
-	case Months::AUGUST:
-	case Months::OCTOBER:
-	case Months::DECEMBER: return 31;
-
-	case Months::APRIL:
-	case Months::JUNE:
-	case Months::SEPTEMBER:
-	case Months::NOVEMBER: return 30;
-
-	case Months::FEBRURARY: return isLeapYear(year) ? 29 : 28;
-	default: return 0;
-	}
 }
