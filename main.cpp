@@ -291,52 +291,52 @@ unsigned displayCalendar(unsigned month,
 
 unsigned getMonthLength(unsigned year, unsigned month) {
 	switch (month) {
-	case Months::JANUARY:
-	case Months::MARCH:
-	case Months::MAY:
-	case Months::JULY:
-	case Months::AUGUST:
-	case Months::OCTOBER:
-	case Months::DECEMBER: return 31;
+    case Months::JANUARY:
+    case Months::MARCH:
+    case Months::MAY:
+    case Months::JULY:
+    case Months::AUGUST:
+    case Months::OCTOBER:
+    case Months::DECEMBER: return 31;
 
-	case Months::APRIL:
-	case Months::JUNE:
-	case Months::SEPTEMBER:
-	case Months::NOVEMBER: return 30;
+    case Months::APRIL:
+    case Months::JUNE:
+    case Months::SEPTEMBER:
+    case Months::NOVEMBER: return 30;
 
-	case Months::FEBRURARY: return isLeapYear(year) ? 29 : 28;
-	default: return 0;
+    case Months::FEBRURARY: return isLeapYear(year) ? 29 : 28;
+    default: return 0;
 	}
 }
 
 string getMonthName(unsigned month) {
 	switch (month) {
-	case Months::JANUARY: return "Janvier";
-	case Months::FEBRURARY: return "Fevrier";
-	case Months::MARCH: return "Mars";
-	case Months::APRIL: return "Avril";
-	case Months::MAY: return "Mai";
-	case Months::JUNE: return "Juin";
-	case Months::JULY: return "Juillet";
-	case Months::AUGUST: return "Aout";
-	case Months::SEPTEMBER: return "Septembre";
-	case Months::OCTOBER: return "Octobre";
-	case Months::NOVEMBER: return "Novembre";
-	case Months::DECEMBER: return "Decembre";
-	default: return "ERROR";
+    case Months::JANUARY: return "Janvier";
+    case Months::FEBRURARY: return "Fevrier";
+    case Months::MARCH: return "Mars";
+    case Months::APRIL: return "Avril";
+    case Months::MAY: return "Mai";
+    case Months::JUNE: return "Juin";
+    case Months::JULY: return "Juillet";
+    case Months::AUGUST: return "Aout";
+    case Months::SEPTEMBER: return "Septembre";
+    case Months::OCTOBER: return "Octobre";
+    case Months::NOVEMBER: return "Novembre";
+    case Months::DECEMBER: return "Decembre";
+    default: return "ERROR";
 	}
 }
 
 string getDayInitial(unsigned day) {
 	switch (day) {
-	case Days::MONDAY: return "L";
-	case Days::TUESDAY: return "M";
-	case Days::WEDNESDAY: return "M";
-	case Days::THURSDAY: return "J";
-	case Days::FRIDAY: return "V";
-	case Days::SATURDAY: return "S";
-	case Days::SUNDAY: return "D";
-	default: return "!";
+    case Days::MONDAY: return "L";
+    case Days::TUESDAY: return "M";
+    case Days::WEDNESDAY: return "M";
+    case Days::THURSDAY: return "J";
+    case Days::FRIDAY: return "V";
+    case Days::SATURDAY: return "S";
+    case Days::SUNDAY: return "D";
+    default: return "!";
 	}
 }
 
