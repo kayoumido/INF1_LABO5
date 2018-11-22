@@ -43,6 +43,8 @@ void cleanStream();
 
 /**
  * @brief Displays an empty line
+ *
+ * @param colWidth int the Width of the column
  * @return void
  */
 void displayEmptyLine(unsigned colWidth);
@@ -60,7 +62,7 @@ void displayCenteredText(const string& text, unsigned colWidth);
  * @brief Display the calendar for a given year
  *
  * @param month	unsigned Month number [0-11]
- * @param firstDayOfMonth unsigned First day of a given month
+ * @param firstDayOfMonth unsigned First day of a given month [1-7]
  * @param mondayPosition unsigned Position of the Monday in the header [1-7]
  * @param year unsigned Year to display [1600-3000]
  * @param WIDTH	unsigned Calendar display width
@@ -325,7 +327,6 @@ string getMonthName(unsigned month) {
 	}
 }
 
-	cout << setw((int)text.length()) << text;
 string getDayInitial(unsigned day) {
 	switch (day) {
 	case Days::MONDAY: return "L";
