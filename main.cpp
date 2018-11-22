@@ -47,7 +47,7 @@ void cleanStream();
  * @param colWidth int the Width of the column
  * @return void
  */
-void displayEmptyLine(unsigned colWidth);
+void displayEmptyLine(int colWidth);
 
 /**
  * @brief Displays a centered text
@@ -56,7 +56,7 @@ void displayEmptyLine(unsigned colWidth);
  * @param colWidth unsigned Width of the column
  * @return void
  */
-void displayCenteredText(const string& text, unsigned colWidth);
+void displayCenteredText(const string& text, int colWidth);
 
 /**
  * @brief Display the calendar for a given year
@@ -167,7 +167,6 @@ int main() {
 	return 0;
 }
 
-
 unsigned checkUserInput(const string& question,
 	const string& errorMessage,
 	const unsigned MIN_VALUE,
@@ -212,11 +211,11 @@ void cleanStream() {
 	cin.ignore(numeric_limits<int>::max(), '\n');
 }
 
-void displayEmptyLine(const unsigned colWidth) {
+void displayEmptyLine(const int colWidth) {
 	cout << setw(colWidth) << "" << endl;
 }
 
-void displayCenteredText(const string& text, const unsigned colWidth) {
+void displayCenteredText(const string& text, const int colWidth) {
 	cout << setw(colWidth / 2 - (int)text.length() / 2) << DISPLAY_FILL;
 	cout << setw((int)text.length()) << text;
 	cout << setw(colWidth - (colWidth / 2 - (int)text.length() / 2) - (int)text.length()) << DISPLAY_FILL << endl;
