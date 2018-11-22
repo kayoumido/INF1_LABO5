@@ -28,7 +28,7 @@ enum Days { MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY };
  * @brief Display the calendar for a given year
  *
  * @param month	unsigned Month number [0-11]
- * @param firstDayOfMonth unsigned First day of a given month
+ * @param firstDayOfMonth unsigned First day of a given month [1-7]
  * @param mondayPosition unsigned Position of the Monday in the header [1-7]
  * @param year unsigned Year to display [1600-3000]
  * @param WIDTH	unsigned Calendar display width
@@ -112,6 +112,7 @@ unsigned checkUserInput(const string& question, const string& errorMessage, unsi
 /**
  * @brief Displays an empty line
  *
+ * @param colWidth int the Width of the column
  * @return void
  */
 void displayEmptyLine(int colWidth);
